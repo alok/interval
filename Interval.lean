@@ -4,6 +4,7 @@ import Interval.Approx.Dyadic
 import Interval.Approx.NormSq
 import Interval.Approx.Rat
 import Interval.Box.Basic
+import Interval.GrindInstances
 import Interval.Box.Division
 import Interval.Box.Exp
 import Interval.EulerMaclaurin.EulerMaclaurin
@@ -27,6 +28,9 @@ import Interval.Interval.Mul
 import Interval.Interval.Order
 import Interval.Interval.Pow
 import Interval.Interval.Series
+import Interval.Interval.Arctan
+import Interval.Interval.Arcsin
+import Interval.Interval.Atan2
 import Interval.Interval.Sincos
 import Interval.Interval.Sqrt
 import Interval.Tactic.Interval
