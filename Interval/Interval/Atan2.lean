@@ -146,7 +146,7 @@ lemma Real.atan2_mono_left_of_pos {a b x : ℝ} (hx : 0 < x) (hab : a ≤ b) :
     rw [← h_tan, Real.arctan_tan h_gt h_lt]
   rw [ha_arg, hb_arg]
   apply Real.arctan_mono
-  exact div_le_div_of_nonneg_right hab (le_of_lt hx)
+  exact div_le_div_of_nonneg_right hab hx.le
 
 /-- On x > 0, atan2 is monotone as a function of y -/
 lemma Real.atan2_monotone_left_of_pos {x : ℝ} (hx : 0 < x) :
@@ -194,7 +194,7 @@ lemma Real.atan2_anti_left_of_neg_of_nonneg {a b x : ℝ} (hx : x < 0) (ha : 0 �
       exact div_neg_of_pos_of_neg hb_pos hx
     linarith
   have ha_pos : 0 < a := lt_of_le_of_ne ha (Ne.symm ha0)
-  rw [Real.atan2_of_neg_of_nonneg hx (le_of_lt ha_pos), Real.atan2_of_neg_of_nonneg hx hb]
+  rw [Real.atan2_of_neg_of_nonneg hx ha_pos.le, Real.atan2_of_neg_of_nonneg hx hb]
   apply add_le_add_right
   apply Real.arctan_mono
   -- b/x ≤ a/x when x < 0 and a ≤ b
@@ -229,7 +229,7 @@ lemma Real.atan2_anti_right_of_nonneg_of_neg {y a b : ℝ} (hy : 0 ≤ y) (ha : 
     have hy_pos : 0 < y := lt_of_le_of_ne hy (Ne.symm hy0)
     have h1 : (1 : ℝ) / b ≤ 1 / a := (one_div_le_one_div_of_neg hb ha).mpr hab
     calc y / b = y * (1 / b) := by rw [mul_one_div]
-      _ ≤ y * (1 / a) := by apply mul_le_mul_of_nonneg_left h1 (le_of_lt hy_pos)
+      _ ≤ y * (1 / a) := by apply mul_le_mul_of_nonneg_left h1 hy_pos.le
       _ = y / a := by rw [mul_one_div]
 
 /-- For x < 0 and y < 0, atan2 is monotone in x (larger x = larger atan2) -/
@@ -245,7 +245,7 @@ lemma Real.atan2_mono_right_of_neg_of_neg {y a b : ℝ} (hy : y < 0) (ha : a < 0
   -- Since y < 0, y * (1/a) ≤ y * (1/b), i.e., y/a ≤ y/b ✓
   have h1 : (1 : ℝ) / a ≥ 1 / b := (one_div_le_one_div_of_neg hb ha).mpr hab
   calc y / a = y * (1 / a) := by rw [mul_one_div]
-    _ ≤ y * (1 / b) := by apply mul_le_mul_of_nonpos_left h1 (le_of_lt hy)
+    _ ≤ y * (1 / b) := by apply mul_le_mul_of_nonpos_left h1 hy.le
     _ = y / b := by rw [mul_one_div]
 
 /-!
@@ -263,7 +263,7 @@ lemma Real.pi_div_two_le_atan2_of_neg_of_nonneg {y x : ℝ} (hx : x < 0) (hy : 0
     rw [this, Complex.arg_ofReal_of_neg hx]
     linarith [Real.pi_pos]
   · have hy_pos : 0 < y := lt_of_le_of_ne hy (Ne.symm hy0)
-    rw [Real.atan2_of_neg_of_nonneg hx (le_of_lt hy_pos)]
+    rw [Real.atan2_of_neg_of_nonneg hx hy_pos.le]
     have arctan_bound : -(π / 2) < Real.arctan (y / x) := Real.neg_pi_div_two_lt_arctan _
     linarith
 
@@ -291,7 +291,7 @@ lemma Real.atan2_nonpos_of_nonpos_of_pos {y x : ℝ} (hy : y ≤ 0) (hx : 0 < x)
 lemma Real.atan2_nonneg_of_nonneg_of_pos {y x : ℝ} (hy : 0 ≤ y) (hx : 0 < x) :
     0 ≤ Real.atan2 y x := by
   rw [Real.atan2_of_pos hx]
-  exact Real.arctan_nonneg.mpr (div_nonneg hy (le_of_lt hx))
+  exact Real.arctan_nonneg.mpr (div_nonneg hy hx.le)
 
 /-- For y ≥ 0 and x > 0 (first quadrant), atan2 ≤ π/2 -/
 lemma Real.atan2_le_pi_div_two_of_pos {y x : ℝ} (hx : 0 < x) :
@@ -341,7 +341,7 @@ lemma Real.atan2_rect_lower_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
     left; left
     calc Real.atan2 y_lo x_lo
         ≤ Real.atan2 ay x_lo := Real.atan2_mono_left_of_pos hx_lo_pos hy_lo
-      _ ≤ Real.atan2 ay ax := Real.atan2_mono_right_of_nonpos_of_pos (le_of_lt hay_nonneg) hx_lo_pos hax_pos hx_lo
+      _ ≤ Real.atan2 ay ax := Real.atan2_mono_right_of_nonpos_of_pos hay_nonneg.le hx_lo_pos hax_pos hx_lo
 
 /-- For a rectangle in the right half-plane (x > 0), atan2 is bounded above by a corner -/
 lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
@@ -365,7 +365,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
     push_neg at hay_nonpos
     right; left
     calc Real.atan2 ay ax
-        ≤ Real.atan2 ay x_lo := Real.atan2_anti_right_of_nonneg_of_pos (le_of_lt hay_nonpos) hx_lo_pos hax_pos hx_lo
+        ≤ Real.atan2 ay x_lo := Real.atan2_anti_right_of_nonneg_of_pos hay_nonpos.le hx_lo_pos hax_pos hx_lo
       _ ≤ Real.atan2 y_hi x_lo := Real.atan2_mono_left_of_pos hx_lo_pos hy_hi
 
 /-!
@@ -651,7 +651,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
               · simp only [Set.mem_insert_iff, Set.mem_singleton_iff, true_or]
               · calc Real.atan2 y.lo.val x.lo.val
                     ≤ Real.atan2 ay x.lo.val := Real.atan2_mono_left_of_pos hx_lo_pos hy.1
-                  _ ≤ Real.atan2 ay ax := Real.atan2_mono_right_of_nonpos_of_pos (le_of_lt hay_sign)
+                  _ ≤ Real.atan2 ay ax := Real.atan2_mono_right_of_nonpos_of_pos hay_sign.le
                       hx_lo_pos hax_pos hx.1
             · -- x.lo ≤ 0 < ax: the rectangle crosses the y-axis
               -- For ay < 0, ax > 0, the third quadrant corner (y.lo, x.lo) gives minimum
@@ -663,7 +663,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
               · -- Third quadrant or y-axis corner ≤ fourth quadrant value
                 -- Key insight: atan2 in third quadrant or at x=0 is ≤ -π/2,
                 -- while atan2 in fourth quadrant is > -π/2
-                have hy_lo_neg : y.lo.val < 0 := lt_of_le_of_lt hy.1 hay_sign
+                have hy_lo_neg : y.lo.val < 0 := hy.1.trans_lt hay_sign
                 have h_corner_bound : Real.atan2 y.lo.val x.lo.val ≤ -(π / 2) := by
                   by_cases hx_lo_neg : x.lo.val < 0
                   · -- Third quadrant: atan2 < -π/2
@@ -671,7 +671,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
                     have h := Real.arctan_lt_pi_div_two (y.lo.val / x.lo.val)
                     linarith
                   · -- x.lo = 0: atan2(y.lo, 0) = -π/2
-                    have hx_lo_zero : x.lo.val = 0 := le_antisymm hx_lo_pos (le_of_not_lt hx_lo_neg)
+                    have hx_lo_zero : x.lo.val = 0 := le_antisymm hx_lo_pos (le_of_not_gt hx_lo_neg)
                     simp only [hx_lo_zero, Real.atan2_of_zero_of_neg hy_lo_neg]
                     linarith
                 have h_actual_bound : -(π / 2) < Real.atan2 ay ax := by
@@ -693,7 +693,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
         simp only [not_lt] at hax_pos
         by_cases hax_neg : ax < 0
         · -- ax < 0: strictly in left half-plane
-          have hx_lo_neg : x.lo.val < 0 := lt_of_le_of_lt hx.1 hax_neg
+          have hx_lo_neg : x.lo.val < 0 := hx.1.trans_lt hax_neg
           by_cases hay_sign : 0 ≤ ay
           · -- ay ≥ 0, ax < 0: second quadrant, atan2 in (π/2, π]
             -- atan2 is anti-monotone in y (larger y = smaller atan2)
@@ -731,7 +731,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
                         have h2 : π / 2 ≤ Real.atan2 ay ax := Real.pi_div_two_le_atan2_of_neg_of_nonneg hax_neg hay_sign
                         linarith
                       · -- x.hi = 0: atan2(y.lo, 0) = π/2, which ≤ atan2(ay, ax) in 2nd quadrant
-                        have hx_hi_zero : x.hi.val = 0 := le_antisymm (le_of_not_lt hx_hi_pos) hx_hi_neg
+                        have hx_hi_zero : x.hi.val = 0 := le_antisymm (le_of_not_gt hx_hi_pos) hx_hi_neg
                         rw [hx_hi_zero, Real.atan2_of_zero_of_pos hy_lo_pos]
                         exact Real.pi_div_two_le_atan2_of_neg_of_nonneg hax_neg hay_sign
                     · -- y.lo ≤ 0 but ay ≥ 0: y-range crosses x-axis
@@ -744,19 +744,19 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
                           have h2 : 0 ≤ Real.atan2 ay ax := Real.atan2_nonneg_of_nonneg_of_neg hay_sign hax_neg
                           linarith
                         · -- y.lo = 0: atan2(0, x.hi) = 0 if x.hi > 0
-                          have hy_lo_zero : y.lo.val = 0 := le_antisymm hy_lo_pos (le_of_not_lt hy_lo_neg)
+                          have hy_lo_zero : y.lo.val = 0 := le_antisymm hy_lo_pos (le_of_not_gt hy_lo_neg)
                           rw [hy_lo_zero, Real.atan2_of_pos hx_hi_pos]
                           simp only [zero_div, Real.arctan_zero]
                           exact Real.atan2_nonneg_of_nonneg_of_neg hay_sign hax_neg
                       · -- x.hi = 0
-                        have hx_hi_zero : x.hi.val = 0 := le_antisymm (le_of_not_lt hx_hi_pos) hx_hi_neg
+                        have hx_hi_zero : x.hi.val = 0 := le_antisymm (le_of_not_gt hx_hi_pos) hx_hi_neg
                         by_cases hy_lo_neg : y.lo.val < 0
                         · -- atan2(y.lo, 0) = -π/2 for y.lo < 0
                           rw [hx_hi_zero, Real.atan2_of_zero_of_neg hy_lo_neg]
                           have h2 : 0 ≤ Real.atan2 ay ax := Real.atan2_nonneg_of_nonneg_of_neg hay_sign hax_neg
                           linarith [Real.pi_pos]
                         · -- y.lo = 0, x.hi = 0: atan2(0,0) = 0
-                          have hy_lo_zero : y.lo.val = 0 := le_antisymm hy_lo_pos (le_of_not_lt hy_lo_neg)
+                          have hy_lo_zero : y.lo.val = 0 := le_antisymm hy_lo_pos (le_of_not_gt hy_lo_neg)
                           -- atan2(0, 0) = 0 by convention
                           simp only [hy_lo_zero, hx_hi_zero, Real.atan2_zero_zero]
                           exact Real.atan2_nonneg_of_nonneg_of_neg hay_sign hax_neg
@@ -775,11 +775,11 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
             · -- y.hi ≥ 0 but ay < 0: This contradicts the branch cut condition!
               -- We have x.lo.val < 0, y.lo.val < 0, y.hi.val ≥ 0 (from hy_hi_neg)
               -- This means the branch cut condition should be true, contradicting hbc
-              have hy_lo_neg : y.lo.val < 0 := lt_of_le_of_lt hy.1 hay_sign
+              have hy_lo_neg : y.lo.val < 0 := hy.1.trans_lt hay_sign
               exfalso
               apply hbc
               exact ⟨⟨Floating.lt_zero_iff.mpr hx_lo_neg, Floating.lt_zero_iff.mpr hy_lo_neg⟩,
-                     Floating.nonneg_iff.mpr (le_of_not_lt hy_hi_neg)⟩
+                     Floating.nonneg_iff.mpr (le_of_not_gt hy_hi_neg)⟩
         · -- ax = 0: on the y-axis
           have hax_zero : ax = 0 := le_antisymm hax_pos (le_of_not_gt hax_neg)
           -- We need to find a corner that gives a lower bound
@@ -795,7 +795,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
                 _ ≤ π / 2 := Real.atan2_le_pi_div_two_of_pos hx_hi_pos
             · -- x.hi = 0: corner (y.lo, 0) gives bound
               have hx_hi_nonneg : 0 ≤ x.hi.val := hax_zero ▸ hx.2
-              have hx_hi_zero : x.hi.val = 0 := le_antisymm (le_of_not_lt hx_hi_pos) hx_hi_nonneg
+              have hx_hi_zero : x.hi.val = 0 := le_antisymm (le_of_not_gt hx_hi_pos) hx_hi_nonneg
               by_cases hy_lo_pos : 0 < y.lo.val
               · calc min (min (Real.atan2 y.lo.val x.lo.val) (Real.atan2 y.lo.val x.hi.val))
                          (min (Real.atan2 y.hi.val x.lo.val) (Real.atan2 y.hi.val x.hi.val))
@@ -818,7 +818,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
                           have h := Real.arctan_lt_pi_div_two (y.lo.val / x.lo.val)
                           linarith [Real.pi_pos]
                   · -- y.lo = 0: atan2(0, x.lo) = π for x.lo < 0, which is > π/2... tricky
-                    have hy_lo_zero : y.lo.val = 0 := le_antisymm hy_lo_pos (le_of_not_lt hy_lo_neg)
+                    have hy_lo_zero : y.lo.val = 0 := le_antisymm hy_lo_pos (le_of_not_gt hy_lo_neg)
                     -- Use corner (y.hi, x.hi): y.hi ≥ ay > 0, x.hi = 0
                     -- atan2(y.hi, 0) = π/2
                     have hy_hi_pos : 0 < y.hi.val := lt_of_lt_of_le hay_pos hy.2
@@ -844,7 +844,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
             · -- ay < 0: atan2(ay, 0) = -π/2
               rw [hax_zero, Real.atan2_of_zero_of_neg hay_neg]
               -- Need corner ≤ -π/2, which means third quadrant or y-axis with y < 0
-              have hy_lo_neg : y.lo.val < 0 := lt_of_le_of_lt hy.1 hay_neg
+              have hy_lo_neg : y.lo.val < 0 := hy.1.trans_lt hay_neg
               -- From hbc: ¬((x.lo < 0 ∧ y.lo < 0) ∧ 0 ≤ y.hi)
               -- Since y.lo < 0, either x.lo ≥ 0 or y.hi < 0
               by_cases hx_lo_neg : x.lo.val < 0
@@ -873,7 +873,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
                   _ = Real.atan2 y.lo.val 0 := by rw [hx_lo_zero]
                   _ = -π / 2 := Real.atan2_of_zero_of_neg hy_lo_neg
             · -- ay = 0: atan2(0, 0) = 0
-              have hay_zero : ay = 0 := le_antisymm hay_pos (le_of_not_lt hay_neg)
+              have hay_zero : ay = 0 := le_antisymm hay_pos (le_of_not_gt hay_neg)
               rw [hax_zero, hay_zero, Real.atan2_zero_zero]
               -- Need corner ≤ 0
               by_cases hy_lo_neg : y.lo.val < 0
@@ -949,7 +949,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
               simp only [hay_zero, hy_hi_zero, Real.atan2_of_pos hax_pos, Real.atan2_of_pos hx_hi_pos, zero_div, le_refl]
         · -- ay < 0 (fourth quadrant): atan2 ay ax < 0, use corner (y.hi, x.hi)
           push_neg at hay_sign
-          have hay_nonpos : ay ≤ 0 := le_of_lt hay_sign
+          have hay_nonpos : ay ≤ 0 := hay_sign.le
           right; right
           calc Real.atan2 ay ax
               ≤ Real.atan2 ay x.hi.val := Real.atan2_mono_right_of_nonpos_of_pos hay_nonpos hax_pos hx_hi_pos hx.2
@@ -957,7 +957,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
       · simp only [not_lt] at hax_pos
         by_cases hax_neg : ax < 0
         · -- ax < 0: left half-plane
-          have hx_lo_neg : x.lo.val < 0 := lt_of_le_of_lt hx.1 hax_neg
+          have hx_lo_neg : x.lo.val < 0 := hx.1.trans_lt hax_neg
           by_cases hay_sign : 0 ≤ ay
           · -- ay ≥ 0 (second quadrant): atan2 ∈ (π/2, π]
             -- atan2 is decreasing in y and decreasing in x, so max at (y.lo, x.lo)
@@ -982,7 +982,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
                 exact ⟨⟨Floating.lt_zero_iff.mpr hx_lo_neg, Floating.lt_zero_iff.mpr hy_lo_nonneg⟩,
                        Floating.nonneg_iff.mpr h⟩
               -- But if y.hi < 0 and ay ≥ 0, we have ay ≤ y.hi < 0 contradiction
-              have : ay < 0 := lt_of_le_of_lt hy.2 hy_hi_neg
+              have : ay < 0 := hy.2.trans_lt hy_hi_neg
               exact absurd hay_sign (not_le.mpr this)
           · -- ay < 0 (third quadrant): atan2 ∈ (-π, -π/2)
             push_neg at hay_sign
@@ -993,7 +993,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
             · -- Corner (y.lo, x.hi) is in fourth quadrant
               -- Fourth quadrant has atan2 ∈ (-π/2, 0), and third quadrant has atan2 < -π/2
               -- So corner value > -π/2 > atan2 ay ax
-              have hy_lo_neg : y.lo.val < 0 := lt_of_le_of_lt hy.1 hay_sign
+              have hy_lo_neg : y.lo.val < 0 := hy.1.trans_lt hay_sign
               exact le_of_lt (calc Real.atan2 ay ax
                   < -π / 2 := Real.atan2_lt_neg_pi_div_two_of_neg_of_neg hay_sign hax_neg
                 _ < Real.atan2 y.lo.val x.hi.val := Real.neg_pi_div_two_lt_atan2_of_pos hx_hi_pos)
@@ -1001,19 +1001,19 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
               simp only [not_lt] at hx_hi_pos
               by_cases hx_hi_neg : x.hi.val < 0
               · -- x.hi < 0: use monotonicity in third quadrant
-                have hy_lo_neg : y.lo.val < 0 := lt_of_le_of_lt hy.1 hay_sign
+                have hy_lo_neg : y.lo.val < 0 := hy.1.trans_lt hay_sign
                 calc Real.atan2 ay ax
                     ≤ Real.atan2 y.lo.val ax := Real.atan2_anti_left_of_neg_of_neg hax_neg hy_lo_neg hay_sign hy.1
                   _ ≤ Real.atan2 y.lo.val x.hi.val := Real.atan2_mono_right_of_neg_of_neg hy_lo_neg hax_neg hx_hi_neg hx.2
               · -- x.hi = 0: corner (y.lo, 0) = -π/2
                 simp only [not_lt] at hx_hi_neg
                 have hx_hi_zero : x.hi.val = 0 := le_antisymm hx_hi_pos hx_hi_neg
-                have hy_lo_neg : y.lo.val < 0 := lt_of_le_of_lt hy.1 hay_sign
+                have hy_lo_neg : y.lo.val < 0 := hy.1.trans_lt hay_sign
                 calc Real.atan2 ay ax
                     ≤ -π / 2 := le_of_lt (Real.atan2_lt_neg_pi_div_two_of_neg_of_neg hay_sign hax_neg)
                   _ = Real.atan2 y.lo.val x.hi.val := by rw [hx_hi_zero, Real.atan2_of_zero_of_neg hy_lo_neg]
         · -- ax = 0: on the y-axis
-          have hax_zero : ax = 0 := le_antisymm hax_pos (le_of_not_lt hax_neg)
+          have hax_zero : ax = 0 := le_antisymm hax_pos (le_of_not_gt hax_neg)
           by_cases hay_pos : 0 < ay
           · -- ay > 0: atan2(ay, 0) = π/2
             rw [hax_zero, Real.atan2_of_zero_of_pos hay_pos]
@@ -1022,7 +1022,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
             by_cases hx_lo_neg : x.lo.val < 0
             · -- Use corner (y.hi, x.lo) in second quadrant
               right; left
-              exact Real.pi_div_two_le_atan2_of_neg_of_nonneg hx_lo_neg (le_of_lt hy_hi_pos)
+              exact Real.pi_div_two_le_atan2_of_neg_of_nonneg hx_lo_neg hy_hi_pos.le
             · -- x.lo = 0: use corner (y.hi, x.lo) which gives atan2(y.hi, 0) = π/2
               simp only [not_lt] at hx_lo_neg
               have hx_lo_zero : x.lo.val = 0 := le_antisymm hx_pos hx_lo_neg
@@ -1058,20 +1058,20 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
                     rw [hx_hi_zero, hy_hi_zero, Real.atan2_zero_zero]
                     linarith [Real.pi_pos]
             · -- ay = 0: atan2(0, 0) = 0
-              have hay_zero : ay = 0 := le_antisymm hay_pos (le_of_not_lt hay_neg)
+              have hay_zero : ay = 0 := le_antisymm hay_pos (le_of_not_gt hay_neg)
               rw [hax_zero, hay_zero, Real.atan2_zero_zero]
               -- Need corner ≥ 0
               by_cases hy_hi_pos : 0 < y.hi.val
               · by_cases hx_hi_pos : 0 < x.hi.val
                 · -- First quadrant corner
                   right; right
-                  exact Real.atan2_nonneg_of_nonneg_of_pos (le_of_lt hy_hi_pos) hx_hi_pos
+                  exact Real.atan2_nonneg_of_nonneg_of_pos hy_hi_pos.le hx_hi_pos
                 · -- x.hi ≤ 0
                   simp only [not_lt] at hx_hi_pos
                   by_cases hx_lo_neg : x.lo.val < 0
                   · -- Second quadrant corner
                     right; left
-                    exact Real.atan2_nonneg_of_nonneg_of_neg (le_of_lt hy_hi_pos) hx_lo_neg
+                    exact Real.atan2_nonneg_of_nonneg_of_neg hy_hi_pos.le hx_lo_neg
                   · -- x = {0}, use (y.hi, 0) = π/2
                     simp only [not_lt] at hx_lo_neg
                     have hx_lo_zero : x.lo.val = 0 := le_antisymm hx_pos hx_lo_neg
@@ -1099,7 +1099,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
                   (max (Real.atan2 y.hi.val x.lo.val) (Real.atan2 y.hi.val x.hi.val)) := by
       by_cases hax_pos : 0 < ax
       · have hx_hi_pos : 0 < x.hi.val := lt_of_lt_of_le hax_pos hx.2
-        have hx_lo_nonpos : x.lo.val ≤ 0 := le_of_not_lt hx_pos
+        have hx_lo_nonpos : x.lo.val ≤ 0 := le_of_not_gt hx_pos
         by_cases hay_sign : 0 ≤ ay
         · have hy_hi_nonneg : 0 ≤ y.hi.val := le_trans hay_sign hy.2
           calc Real.atan2 ay ax
@@ -1125,11 +1125,10 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
           simp only [not_le] at hay_sign
           -- In fourth quadrant, atan2 is mono in both y and x (when y ≤ 0)
           -- So max at (y.hi, x.hi)
-          have hy_hi_nonpos : y.hi.val ≤ 0 := le_trans hy.2 (le_of_lt hay_sign)
           calc Real.atan2 ay ax
               ≤ Real.atan2 y.hi.val ax := Real.atan2_mono_left_of_pos hax_pos hy.2
             _ ≤ Real.atan2 y.hi.val x.hi.val := Real.atan2_mono_right_of_nonpos_of_pos
-                  hy_hi_nonpos hax_pos hx_hi_pos hx.2
+                  (hy.2.trans hay_sign.le) hax_pos hx_hi_pos hx.2
             _ ≤ max (Real.atan2 y.hi.val x.lo.val) (Real.atan2 y.hi.val x.hi.val) := le_max_right _ _
             _ ≤ max (max (Real.atan2 y.lo.val x.lo.val) (Real.atan2 y.lo.val x.hi.val))
                     (max (Real.atan2 y.hi.val x.lo.val) (Real.atan2 y.hi.val x.hi.val)) := le_max_right _ _
@@ -1137,7 +1136,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
         simp only [not_lt] at hax_pos
         by_cases hax_neg : ax < 0
         · -- ax < 0: Second or third quadrant
-          have hx_lo_neg : x.lo.val < 0 := lt_of_le_of_lt hx.1 hax_neg
+          have hx_lo_neg : x.lo.val < 0 := hx.1.trans_lt hax_neg
           by_cases hay_sign : 0 ≤ ay
           · -- ay ≥ 0, ax < 0: Second quadrant
             -- atan2 is anti in y and anti in x, so max at (y.lo, x.lo)
@@ -1160,7 +1159,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
               have hy_hi_nonneg : 0 ≤ y.hi.val := le_trans hay_sign hy.2
               calc Real.atan2 ay ax
                   ≤ Real.atan2 y.lo.val ax := Real.atan2_anti_left_of_neg_of_nonneg
-                      hax_neg (le_of_lt hy_lo_nonneg) hay_sign hy.1
+                      hax_neg hy_lo_nonneg.le hay_sign hy.1
                 _ ≤ Real.atan2 y.lo.val x.lo.val := Real.atan2_mono_right_of_neg_of_neg
                       hy_lo_nonneg hx_lo_neg hax_neg hx.1
                 _ ≤ max (Real.atan2 y.lo.val x.lo.val) (Real.atan2 y.lo.val x.hi.val) := le_max_left _ _
@@ -1169,7 +1168,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
           · -- ay < 0, ax < 0: Third quadrant
             simp only [not_le] at hay_sign
             -- atan2 is anti in y and mono in x, so max at (y.lo, x.hi)
-            have hy_lo_neg : y.lo.val < 0 := lt_of_le_of_lt hy.1 hay_sign
+            have hy_lo_neg : y.lo.val < 0 := hy.1.trans_lt hay_sign
             by_cases hy_hi_neg : y.hi.val < 0
             · -- y.hi < 0: entire y range is negative
               by_cases hx_hi_neg : x.hi.val < 0
@@ -1199,7 +1198,7 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
                     _ ≤ max (max (Real.atan2 y.lo.val x.lo.val) (Real.atan2 y.lo.val x.hi.val))
                             (max (Real.atan2 y.hi.val x.lo.val) (Real.atan2 y.hi.val x.hi.val)) := le_max_left _ _
                 · -- x.hi = 0
-                  have hx_hi_zero : x.hi.val = 0 := le_antisymm hx_hi_neg (le_of_not_lt hx_hi_pos)
+                  have hx_hi_zero : x.hi.val = 0 := le_antisymm hx_hi_neg (le_of_not_gt hx_hi_pos)
                   -- atan2(y.lo, 0) = -π/2 for y.lo < 0
                   calc Real.atan2 ay ax
                       ≤ -π / 2 := by
@@ -1223,11 +1222,11 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
           · -- ay > 0: atan2(ay, 0) = π/2, need π/2 ≤ corner
             rw [hax_zero, Real.atan2_of_zero_of_pos hay_pos]
             have hy_hi_pos : 0 < y.hi.val := lt_of_lt_of_le hay_pos hy.2
-            have hx_lo_nonpos : x.lo.val ≤ 0 := le_of_not_lt hx_pos
+            have hx_lo_nonpos : x.lo.val ≤ 0 := le_of_not_gt hx_pos
             by_cases hx_lo_neg : x.lo.val < 0
             · -- x.lo < 0: (y.hi, x.lo) is in second quadrant
               have h : π / 2 ≤ Real.atan2 y.hi.val x.lo.val :=
-                Real.pi_div_two_le_atan2_of_neg_of_nonneg hx_lo_neg (le_of_lt hy_hi_pos)
+                Real.pi_div_two_le_atan2_of_neg_of_nonneg hx_lo_neg hy_hi_pos.le
               calc π / 2
                   ≤ Real.atan2 y.hi.val x.lo.val := h
                 _ ≤ max (Real.atan2 y.hi.val x.lo.val) (Real.atan2 y.hi.val x.hi.val) := le_max_left _ _
@@ -1247,8 +1246,8 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
             by_cases hay_neg : ay < 0
             · -- ay < 0: atan2(ay, 0) = -π/2
               rw [hax_zero, Real.atan2_of_zero_of_neg hay_neg]
-              have hx_lo_nonpos : x.lo.val ≤ 0 := le_of_not_lt hx_pos
-              have hy_lo_neg : y.lo.val < 0 := lt_of_le_of_lt hy.1 hay_neg
+              have hx_lo_nonpos : x.lo.val ≤ 0 := le_of_not_gt hx_pos
+              have hy_lo_neg : y.lo.val < 0 := hy.1.trans_lt hay_neg
               by_cases hx_hi_pos : 0 < x.hi.val
               · -- x.hi > 0: (y.lo, x.hi) is in fourth quadrant
                 have h : -π / 2 < Real.atan2 y.lo.val x.hi.val :=
@@ -1270,9 +1269,9 @@ lemma Real.atan2_rect_upper_bound_pos {ay ax y_lo y_hi x_lo x_hi : ℝ}
                   _ ≤ max (max (Real.atan2 y.lo.val x.lo.val) (Real.atan2 y.lo.val x.hi.val))
                           (max (Real.atan2 y.hi.val x.lo.val) (Real.atan2 y.hi.val x.hi.val)) := le_max_left _ _
             · -- ay = 0: atan2(0, 0) = 0
-              have hay_zero : ay = 0 := le_antisymm hay_pos (le_of_not_lt hay_neg)
+              have hay_zero : ay = 0 := le_antisymm hay_pos (le_of_not_gt hay_neg)
               rw [hax_zero, hay_zero, Real.atan2_zero_zero]
-              have hx_lo_nonpos : x.lo.val ≤ 0 := le_of_not_lt hx_pos
+              have hx_lo_nonpos : x.lo.val ≤ 0 := le_of_not_gt hx_pos
               have hx_hi_nonneg : 0 ≤ x.hi.val := hax_zero ▸ hx.2
               have hy_lo_nonpos : y.lo.val ≤ 0 := hay_zero ▸ hy.1
               have hy_hi_nonneg : 0 ≤ y.hi.val := hay_zero ▸ hy.2
